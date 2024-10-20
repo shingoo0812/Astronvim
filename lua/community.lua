@@ -24,5 +24,5 @@ return {
   -- { import = "astrocommunity.completion.copilot-lua-cmp" },
   -- -- Syntax
   { import = "astrocommunity.syntax.vim-easy-align" },
-  { import = "astrocommunity.recipes.vscode" },
+  -- { import = "astrocommunity.recipes.vscode" },
 }
