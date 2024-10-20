@@ -77,6 +77,9 @@ return {
         -- Move Line
         ["<A-j>"] = { "<Cmd>move .+1<CR>==" },
         ["<A-k>"] = { "<Cmd>move .-2<CR>==" },
+        -- Keymaps for diffget. Useful when resolving conflicts
+        ["<gh>"] = { "<Cmd>diffget //2<CR>", desc = "Grab changes from the left (LOCAL)" },
+        ["<gl>"] = { "<Cmd>diffget //3<CR>", desc = "Grab changes from the right (INCOMING)" },
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
         -- ["<Leader>b"] = { desc = "Buffers" },
