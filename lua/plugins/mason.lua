@@ -30,7 +30,17 @@ return {
     opts = {
       ensure_installed = {
         "python",
+        "cs",
         -- add more arguments for adding more debuggers
+      },
+      handlers = {
+        function(config)
+          if config.type == "unity" then
+            config.request = "attach"
+            config.name = "Unity Editor"
+            config.path = "MyTopDownProject/Library/EditorInstance.json"
+          end
+        end,
       },
     },
   },

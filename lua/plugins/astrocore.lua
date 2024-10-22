@@ -29,7 +29,7 @@ return {
         number = true, -- sets vim.opt.number
         spell = false, -- sets vim.opt.spell
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
-        wrap = false, -- sets vim.opt.wrap
+        wrap = true, -- sets vim.opt.wrap
         shiftwidth = 4,
         tabstop = 4,
       },
@@ -62,41 +62,49 @@ return {
         },
         -- Search and Replace
         ["<leader>sr"] = {
-          ":%s/<<C-r><C-w>>/<C-r><C-w>/gI<Left><Left><Left><CR>",
+          ":%s/<<C-r><C-w>>/<C-r><C-w>/gI<Left><Left><Left><cr>gc",
           desc = "Search And Replace The Word Under The Cursor",
         },
         -- pane Resize
-        ["<A-n>"] = { ":vertical resize +2<CR>", desc = "resize pane to left" },
-        ["<A-m>"] = { ":vertical resize -2<CR>", desc = "resize pane to right" },
-        ["<A-,>"] = { ":resize -2<CR>", desc = "resize pane to up" },
-        ["<A-.>"] = { ":resize +2<CR>", desc = "resize pane to down" },
+        ["<A-n>"] = { ":vertical resize +2<cr>", desc = "resize pane to left" },
+        ["<A-.>"] = { ":vertical resize -2<cr>", desc = "resize pane to right" },
+        ["<A-m>"] = { ":resize -2<cr>gc", desc = "resize pane to up" },
+        ["<A-,>"] = { ":resize +2<cr>gc", desc = "resize pane to down" },
         ["<A-=>"] = { "<C-w>=", desc = "Resize equal" },
         -- split
         ["<A-v>"] = { "<C-w>v", desc = "Split window vertically" },
         ["<A-s>"] = { "<C-w>s", desc = "Split window horizontally" },
         -- Copilot
-        ["<C-[>"] = { ":Copilot suggestion<CR>", desc = "Copilot suggestion" },
+        ["<C-[>"] = { ":Copilot suggestion<cr>gc", desc = "Copilot suggestion" },
+        ["<leader>k"] = { "", desc = "Copilot" },
+        ["<leader>kc"] = { "<cmd>CopilotChat<cr>", desc = "CopilotChat open" },
+        ["<leader>kx"] = { "<cmd>CopilotChatClose<cr>", desc = "CopilotChat close" },
+        ["<leader>kf"] = { "<cmd>CopilotChatFix<cr>", desc = "CopilotChatFix open" },
+
         -- Move Line
-        ["<A-j>"] = { "<Cmd>move .+1<CR>==" },
-        ["<A-k>"] = { "<Cmd>move .-2<CR>==" },
+        ["<A-J>"] = { "<CMD>MOVE .+1<cr>==" },
+        ["<A-k>"] = { "<Cmd>move .-2<cr>==" },
         -- Keymaps for diffget. Useful when resolving conflicts
-        ["<gh>"] = { "<Cmd>diffget //2<CR>", desc = "Grab changes from the left (LOCAL)" },
-        ["<gl>"] = { "<Cmd>diffget //3<CR>", desc = "Grab changes from the right (INCOMING)" },
+        ["<gh>"] = { "<Cmd>diffget //2<cr>gc", desc = "Grab changes from the left (LOCAL)" },
+        ["<gl>"] = { "<Cmd>diffget //3<cr>gc", desc = "Grab changes from the right (INCOMING)" },
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
         -- ["<Leader>b"] = { desc = "Buffers" },
-
+        ["<leader>bn"] = { "<cmd>tabnew<cr>", desc = "New tab" },
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
       },
       v = {
         ["d"] = { '"_d' },
       },
-      i = {},
+      i = {
+        ["jk"] = { "<esc>", desc = "Normal Mode" },
+        ["<C-o>"] = { "<esc>o", desc = "Go to normal mode, create new line" },
+      },
       x = {
         -- Move Line
-        ["<A-j>"] = { ":move '>+1<CR>gv=gv" },
-        ["<A-k>"] = { ":move '<-2<CR>gv=gv" },
+        ["<A-j>"] = { ":move '>+1<cr>gcgv=gv" },
+        ["<A-k>"] = { ":move '<-2<cr>gcgv=gv" },
       },
     },
   },

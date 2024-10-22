@@ -100,9 +100,19 @@ return {
     },
     -- A custom `on_attach` function to be run after the default `on_attach` function
     -- takes two parameters `client` and `bufnr`  (`:h lspconfig-setup`)
-    on_attach = function(client, bufnr)
-      -- this would disable semanticTokensProvider for all clients
-      -- client.server_capabilities.semanticTokensProvider = nil
-    end,
+    -- on_attach = function(client, bufnr)
+    -- this would disable semanticTokensProvider for all clients
+    -- client.server_capabilities.semanticTokensProvider = nil
+    -- end,
+    vim.cmd [[
+      command! ModifyCSProjFile call ModifyCSProjFile()
+      function! ModifyCSProjFile()
+          call system("find . -maxdepth 2 -name \"*.csproj\" | xargs sed -i -e 's/C:/\\/mnt\\/c/g'")
+          call system("find . -maxdepth 2 -name \"*.csproj\" | xargs sed -i -e 's/D:/\\/mnt\\/d/g'")
+          if exists(':YcmCompleter')
+              execute "YcmCompleter ReloadSolution"
+          endif
+      endfunction
+    ]],
   },
 }
