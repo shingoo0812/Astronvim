@@ -94,7 +94,6 @@ return {
         ["<leader>bn"] = { "<cmd>tabnew<cr>", desc = "New tab" },
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
-        -- TODO : create ssh-keygen command
       },
       v = {
         ["d"] = { '"_d' },
