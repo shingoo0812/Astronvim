@@ -15,7 +15,7 @@ return {
   { import = "astrocommunity.colorscheme.gruvbox-nvim" },
   -- { import = "astrocommunity.colorscheme.catppuccin" },
   -- -- Motion
-  { import = "astrocommunity.motion.leap-nvim" },
+  -- { import = "astrocommunity.motion.leap-nvim" },
   { import = "astrocommunity.motion.mini-surround" },
   -- -- Editing
   { import = "astrocommunity.editing-support.suda-vim" },
