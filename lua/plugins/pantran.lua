@@ -37,7 +37,6 @@ return {
           select = {
             n = {
               -- ...
-              ["<leader>trp"] = { "<cmd>Pantran<cr>", desc = "Launch Pantran for translation" },
             },
           },
         },

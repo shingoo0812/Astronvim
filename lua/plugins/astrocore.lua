@@ -73,6 +73,8 @@ return {
           ":%s/(<C-r><C-w>)/<C-r><C-w>/gI<Left><Left><Left><cr>gc",
           desc = "Search And Replace The Word Under The Cursor",
         },
+
+        ["<leader>trp"] = { "<cmd>Pantran<cr>", desc = "Launch Pantran for translation" },
         -- pane Resize
         ["<A-n>"] = { ":vertical resize +2<cr>", desc = "resize pane to left" },
         ["<A-.>"] = { ":vertical resize -2<cr>", desc = "resize pane to right" },
