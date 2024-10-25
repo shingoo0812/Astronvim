@@ -50,4 +50,5 @@ return {
       },
     }
   end,
+  keymapping = {},
 }

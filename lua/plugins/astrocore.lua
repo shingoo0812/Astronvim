@@ -33,6 +33,9 @@ return {
         wrap = true, -- sets vim.opt.wrap
         shiftwidth = 4,
         tabstop = 4,
+        encoding = "utf-8",
+        fileencodings = "utf-8",
+        fileencoding = "utf-8",
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
@@ -62,8 +65,12 @@ return {
           desc = "Close buffer from tabline",
         },
         -- Search and Replace
-        ["<leader>sr"] = {
+        ["<leader>s<"] = {
           ":%s/<<C-r><C-w>>/<C-r><C-w>/gI<Left><Left><Left><cr>gc",
+          desc = "Search And Replace The Word Under The Cursor",
+        },
+        ["<leader>s("] = {
+          ":%s/(<C-r><C-w>)/<C-r><C-w>/gI<Left><Left><Left><cr>gc",
           desc = "Search And Replace The Word Under The Cursor",
         },
         -- pane Resize
@@ -76,24 +83,25 @@ return {
         ["<A-v>"] = { "<C-w>v", desc = "Split window vertically" },
         ["<A-s>"] = { "<C-w>s", desc = "Split window horizontally" },
         -- Copilot
-        ["<C-[>"] = { ":Copilot suggestion<cr>gc", desc = "Copilot suggestion" },
         ["<leader>k"] = { "", desc = "Copilot" },
+        ["<C-[>"] = { ":Copilot suggestion<cr>gc", desc = "Copilot suggestion" },
         ["<leader>kc"] = { "<cmd>CopilotChat<cr>", desc = "CopilotChat open" },
         ["<leader>kx"] = { "<cmd>CopilotChatClose<cr>", desc = "CopilotChat close" },
         ["<leader>kf"] = { "<cmd>CopilotChatFix<cr>", desc = "CopilotChatFix open" },
-
         -- Move Line
         ["<A-J>"] = { "<CMD>MOVE .+1<cr>==" },
         ["<A-k>"] = { "<Cmd>move .-2<cr>==" },
         -- Keymaps for diffget. Useful when resolving conflicts
         ["<gh>"] = { "<Cmd>diffget //2<cr>gc", desc = "Grab changes from the left (LOCAL)" },
         ["<gl>"] = { "<Cmd>diffget //3<cr>gc", desc = "Grab changes from the right (INCOMING)" },
-        -- tables with just a `desc` key will be registered with which-key if it's installed
-        -- this is useful for naming menus
-        -- ["<Leader>b"] = { desc = "Buffers" },
         ["<leader>bn"] = { "<cmd>tabnew<cr>", desc = "New tab" },
-        -- setting a mapping to false will disable it
-        -- ["<C-S>"] = false,
+        ["<leader>gn"] = { "<cmd>e ~/dotfiles/linux/nvim<cr>", desc = "Open Nvim conf location" },
+        ["<leader>gz"] = { "<cmd>e ~/dotfiles/linux/zsh<cr>", desc = "Open zsh conf location" },
+        ["<leader>lc"] = {
+          "<cmd>redir > ./message.txt | silent messages | redir END<CR>",
+          desc = "Save messages to message.txt",
+        },
+        ["<leader>r"] = { "<cmd>:AstroReload<cr>", desc = "Astro Reload" },
       },
       v = {
         ["d"] = { '"_d' },
