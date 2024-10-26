@@ -12,30 +12,166 @@ return {
   },
   lazy = true,
   config = function()
-    local conda_env = os.getenv "CONDA_PREFIX"
-    local command
-    if conda_env then
-      command = string.format("%s/bin/python", conda_env)
-    else
-      local virtual_env = os.getenv "VIRTUAL_ENV"
-      command = virtual_env and string.format("%s/bin/python", virtual_env) or "python"
+    local dap, dapui = require "dap", require "dapui"
+    -- If using nvim dap, start dapui automatically
+    dap.listeners.before.attach.dapui_config = function() dapui.open() end
+    dap.listeners.before.launch.dapui_config = function() dapui.open() end
+    dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
+    dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
+
+    -- Change path for conda environment or virtual environment
+    local function get_conda_executable(bin_name)
+      local conda_env = os.getenv "CONDA_PREFIX"
+      local home = string.format("%s/miniconda3", os.getenv "HOME")
+      if conda_env and conda_env ~= home then
+        print "Using Conda Environment"
+        print(home)
+        return string.format("%s/bin/%s", conda_env, bin_name)
+      elseif virtual_env then
+        print "Using Virtual Environment"
+        return string.format("%s/bin/%s", virtual_env, bin_name)
+      else
+        print "Using System Python"
+        print(bin_name)
+        return bin_name
+      end
     end
 
-    require("dap-python").setup(command)
-    -- Register DAP-related key mappings with which-key and descriptions
-    --
+    -- Python dap configuration
+    local python_command = get_conda_executable "python"
+    require("dap-python").setup(python_command)
+
+    -- Debugger settings for each language
+    local debug_configs = {
+      cpp = function()
+        dap.adapters.cppdbg = {
+          id = "cppdbg",
+          type = "executable",
+          command = get_conda_executable "lldb-vscode", -- using lldb in conda
+        }
+        dap.configurations.cpp = {
+          {
+            name = "Launch C++",
+            type = "cppdbg",
+            request = "launch",
+            program = "${fileDirname}/${fileBasenameNoExtension}",
+            cwd = "${workspaceFolder}",
+            stopOnEntry = true,
+            args = {},
+          },
+        }
+      end,
+
+      cs = function()
+        dap.adapters.coreclr = {
+          type = "executable",
+          command = get_conda_executable "netcoredbg", -- using netcoredbg in conda
+          args = { "--interpreter=vscode" },
+        }
+        dap.configurations.cs = {
+          {
+            type = "coreclr",
+            name = "Launch - netcoredbg",
+            request = "launch",
+            -- program = ${file},
+            program = function()
+              return vim.fn.input("Path to dll", vim.fn.getcwd() .. "/bin/Debug/", "file")
+              -- return vim.fn.input "Path to dll: "
+              -- return "/mnt/h/Work/Programming/C#/Tutorial/bin/Debug/net8.0/Tutorial.dll"
+            end,
+            env = {
+
+              ASPNETCORE_ENVIRONMENT = function() return vim.fn.input("ASPNETCORE_ENVIRONMENT: ", "Development") end,
+              ASPNETCORE_URLS = function()
+                -- todo: request input from ui
+                return "http://localhost:5050"
+              end,
+            },
+            cwd = function() return vim.fn.input("Workspace folder: ", vim.fn.getcwd() .. "/", "file") end,
+          },
+        }
+      end,
+
+      -- JavaScript and TypeScript DAP Configuration
+      javascript = function()
+        require("dap-vscode-js").setup {
+          node_path = "node",
+          debugger_path = vim.fn.stdpath "data" .. "/mason/packages/js-debug-adapter",
+          adapters = { "pwa-node" },
+        }
+      end,
+
+      typescript = function()
+        dap.configurations.typescript = {
+          {
+            type = "pwa-node",
+            request = "launch",
+            name = "Launch file",
+            program = "${file}",
+            cwd = "${workspaceFolder}",
+          },
+          {
+            type = "pwa-node",
+            request = "attach",
+            name = "Attach",
+            processId = require("dap.utils").pick_process,
+            cwd = "${workspaceFolder}",
+          },
+        }
+      end,
+
+      go = function()
+        dap.adapters.go = {
+          type = "server",
+          port = "${port}",
+          executable = {
+            command = "dlv",
+            args = { "dap", "-l", "127.0.0.1:${port}" },
+          },
+        }
+
+        dap.configurations.go = {
+          {
+            type = "go",
+            name = "Debug",
+            request = "launch",
+            program = "${file}",
+          },
+        }
+      end,
+    }
+
+    -- Setting up debuggers for each language
+    local function setup_debugger(language)
+      if debug_configs[language] then
+        debug_configs[language]()
+      else
+        print("Debugger configuration for " .. language .. " not found.")
+      end
+    end
+
+    -- Set up a debugger for the language you need
+    setup_debugger "cpp"
+    setup_debugger "cs"
+    setup_debugger "javascript"
+    setup_debugger "typescript"
+    setup_debugger "go"
+
     -- Register DAP-related key mappings with which-key and descriptions
     local wk = require "which-key"
 
     wk.add {
       { "<F5>", "<cmd>DapContinue<cr>", desc = "Continue Debugging" },
       { "<F10>", "<cmd>DapStepOver<cr>", desc = "Step Over" },
-      { "< F11 >", "<cmd>DapStepInto<cr>", desc = "Step Into" },
+      { "<F11>", "<cmd>DapStepInto<cr>", desc = "Step Into" },
       { "<F12>", "<cmd>DapStepOut<cr>", desc = "Step Out" },
+      { "<leader>D1", "<cmd>DapContinue<cr>", desc = "Continue Debugging" },
+      { "<leader>D2", "<cmd>DapStepOver<cr>", desc = "Step Over" },
+      { "<leader>D3", "<cmd>DapStepInto<cr>", desc = "Step Into" },
+      { "<leader>D4", "<cmd>DapStepOut<cr>", desc = "Step Out" },
+      { "<M-k>", '<cmd>lua require("dapui").eval()<cr>', desc = "Dapui Eval" },
       { "<leader>D", group = "DAP" },
-
       { "<leader>Db", group = "Breakpoint" },
-
       { "<leader>Dbt", "<cmd>DapToggleBreakpoint<cr>", desc = "Toggle Breakpoint" },
       {
         "<leader>Dbc",
@@ -47,28 +183,13 @@ return {
         '<cmd>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>',
         desc = "Set Log Point",
       },
-      { "<leader>Do", '<cmd>lua require("dap").repl.open()<CR>', desc = "Open REPL" },
-
-      { "<leader>Dr", '<cmd>lua require("dap").run_last()<CR>', desc = "Run Last" },
-      { "<leader>Dt", '<cmd>lua require("dap").toggle()<CR>', desc = "Toggle DAP UI" },
-      -- ["<leader>D"] = {
-      --   name = "Debugging",
-      --   b = { ":DapToggleBreakpoint<CR>", "Toggle Breakpoint" },
-      --   B = {
-      --     ':lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Breakpoint condition: "))<CR>',
-      --     "Set Breakpoint Condition",
-      --   },
-      --   lp = {
-      --     ':lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>',
-      --     "Set Log Point",
-      --   },
-      --   r = { ':lua require("dap").repl.open()<CR>', "Open REPL" },
-      --   l = { ':lua require("dap").run_last()<CR>', "Run Last" },
-      --   o = { ':lua require("dapui").toggle()<CR>', "Toggle DAP UI" },
-      -- },
+      { "<leader>Do", "<cmd>lua dap.repl.open()<CR>", desc = "Open REPL" },
+      { "<leader>Dr", "<cmd>lua dap.run_last()<CR>", desc = "Run Last" },
+      { "<leader>dt", "<cmd>lua dapui.toggle()<cr>", desc = "toggle dap ui" },
     }
 
-    require("dapui").setup {
+    -- DAP UI
+    dapui.setup {
       icons = { expanded = "▾", collapsed = "▸" },
       layouts = {
         {
