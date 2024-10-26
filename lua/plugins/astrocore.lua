@@ -97,7 +97,7 @@ return {
         ["<gh>"] = { "<Cmd>diffget //2<cr>gc", desc = "Grab changes from the left (LOCAL)" },
         ["<gl>"] = { "<Cmd>diffget //3<cr>gc", desc = "Grab changes from the right (INCOMING)" },
         ["<leader>bn"] = { "<cmd>tabnew<cr>", desc = "New tab" },
-        ["<leader>gn"] = { "<cmd>e ~/dotfiles/linux/nvim<cr>", desc = "Open Nvim conf location" },
+        ["<leader>gv"] = { "<cmd>e ~/dotfiles/linux/nvim<cr>", desc = "Open Nvim conf location" },
         ["<leader>gz"] = { "<cmd>e ~/dotfiles/linux/zsh<cr>", desc = "Open zsh conf location" },
         ["<leader>lc"] = {
           "<cmd>redir > ./message.txt | silent messages | redir END<CR>",

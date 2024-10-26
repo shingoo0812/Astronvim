@@ -92,6 +92,24 @@ return {
         }
       end,
 
+      unity = function()
+        dap.adapters.unity = {
+          type = "executable",
+          command = "mono",
+          args = {
+            "/mnt/c/Users/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/UnityDebugAdapter.dll",
+          },
+        }
+
+        dap.configurations.cs = {
+          {
+            type = "unity",
+            request = "attach",
+            name = "Unity Editor",
+          },
+        }
+      end,
+
       -- JavaScript and TypeScript DAP Configuration
       javascript = function()
         require("dap-vscode-js").setup {
@@ -158,36 +176,36 @@ return {
     setup_debugger "go"
 
     -- Register DAP-related key mappings with which-key and descriptions
-    local wk = require "which-key"
-
-    wk.add {
-      { "<F5>", "<cmd>DapContinue<cr>", desc = "Continue Debugging" },
-      { "<F10>", "<cmd>DapStepOver<cr>", desc = "Step Over" },
-      { "<F11>", "<cmd>DapStepInto<cr>", desc = "Step Into" },
-      { "<F12>", "<cmd>DapStepOut<cr>", desc = "Step Out" },
-      { "<leader>D1", "<cmd>DapContinue<cr>", desc = "Continue Debugging" },
-      { "<leader>D2", "<cmd>DapStepOver<cr>", desc = "Step Over" },
-      { "<leader>D3", "<cmd>DapStepInto<cr>", desc = "Step Into" },
-      { "<leader>D4", "<cmd>DapStepOut<cr>", desc = "Step Out" },
-      { "<M-k>", '<cmd>lua require("dapui").eval()<cr>', desc = "Dapui Eval" },
-      { "<leader>D", group = "DAP" },
-      { "<leader>Db", group = "Breakpoint" },
-      { "<leader>Dbt", "<cmd>DapToggleBreakpoint<cr>", desc = "Toggle Breakpoint" },
-      {
-        "<leader>Dbc",
-        '<cmd>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Breakpoint condition: "))<CR>',
-        desc = "Set Breakpoint Condition",
-      },
-      {
-        "<leader>Dl",
-        '<cmd>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>',
-        desc = "Set Log Point",
-      },
-      { "<leader>Do", "<cmd>lua dap.repl.open()<CR>", desc = "Open REPL" },
-      { "<leader>Dr", "<cmd>lua dap.run_last()<CR>", desc = "Run Last" },
-      { "<leader>dt", "<cmd>lua dapui.toggle()<cr>", desc = "toggle dap ui" },
-    }
-
+    -- local wk = require "which-key"
+    --
+    -- wk.add {
+    --   { "<F5>", "<cmd>DapContinue<cr>", desc = "Continue Debugging" },
+    --   { "<F10>", "<cmd>DapStepOver<cr>", desc = "Step Over" },
+    --   { "<F11>", "<cmd>DapStepInto<cr>", desc = "Step Into" },
+    --   { "<F12>", "<cmd>DapStepOut<cr>", desc = "Step Out" },
+    --   { "<leader>D1", "<cmd>DapContinue<cr>", desc = "Continue Debugging" },
+    --   { "<leader>D2", "<cmd>DapStepOver<cr>", desc = "Step Over" },
+    --   { "<leader>D3", "<cmd>DapStepInto<cr>", desc = "Step Into" },
+    --   { "<leader>D4", "<cmd>DapStepOut<cr>", desc = "Step Out" },
+    --   { "<M-k>", '<cmd>lua require("dapui").eval()<cr>', desc = "Dapui Eval" },
+    --   { "<leader>D", group = "DAP" },
+    --   { "<leader>Db", group = "Breakpoint" },
+    --   { "<leader>Dbt", "<cmd>DapToggleBreakpoint<cr>", desc = "Toggle Breakpoint" },
+    --   {
+    --     "<leader>Dbc",
+    --     '<cmd>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Breakpoint condition: "))<CR>',
+    --     desc = "Set Breakpoint Condition",
+    --   },
+    --   {
+    --     "<leader>Dl",
+    --     '<cmd>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>',
+    --     desc = "Set Log Point",
+    --   },
+    --   { "<leader>Do", "<cmd>lua dap.repl.open()<CR>", desc = "Open REPL" },
+    --   { "<leader>Dr", "<cmd>lua dap.run_last()<CR>", desc = "Run Last" },
+    --   { "<leader>dt", "<cmd>lua dapui.toggle()<cr>", desc = "toggle dap ui" },
+    -- }
+    --
     -- DAP UI
     dapui.setup {
       icons = { expanded = "▾", collapsed = "▸" },
