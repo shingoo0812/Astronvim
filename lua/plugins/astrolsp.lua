@@ -24,6 +24,8 @@ return {
           "cs",
           "lua_ls",
           "lua",
+          "sh",
+          "python",
         },
         ignore_filetypes = { -- disable format on save for specified filetypes
           -- "python",
@@ -41,12 +43,20 @@ return {
     -- enable servers that you already have installed without mason
     servers = {
       -- "pyright"
+      "omnisharp",
     },
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
       clangd = { capabilities = { offsetEncoding = "utf-8" } },
-      omnisharp = { capabilities = { offsetEncoding = "utf-8" } },
+      omnisharp = {
+        capabilities = { offsetEncoding = "utf-8" },
+        settings = {
+          omnisharp = {
+            useModernNet = false, --[[ enableRoslynAnalyzers = false ]]
+          },
+        },
+      },
       luau_lsp = { capabilities = { offsetEncoding = "utf-8" } },
     },
     -- customize how language servers are attached
@@ -57,6 +67,11 @@ return {
       -- the key is the server that is being setup with `lspconfig`
       -- rust_analyzer = false, -- setting a handler to false will disable the set up of that language server
       -- pyright = function(_, opts) require("lspconfig").pyright.setup(opts) end -- or a custom handler function can be passed
+      omnisharp = function(_, opts)
+        -- Custom configuration of omni sharp server
+        opts.cmd = { "omnisharp-mono", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) }
+        require("lspconfig").omnisharp.setup(opts)
+      end,
     },
     -- Configure buffer local auto commands to add when attaching a language server
     autocmds = {
@@ -104,6 +119,7 @@ return {
     -- this would disable semanticTokensProvider for all clients
     -- client.server_capabilities.semanticTokensProvider = nil
     -- end,
+    --
     vim.cmd [[
       command! ModifyCSProjFile call ModifyCSProjFile()
       function! ModifyCSProjFile()

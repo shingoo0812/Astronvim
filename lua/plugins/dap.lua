@@ -93,21 +93,69 @@ return {
       end,
 
       unity = function()
-        dap.adapters.unity = {
+        local vstuc_path = "/mnt/c/Users/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
+        dap.adapters.vstuc = {
           type = "executable",
-          command = "mono",
-          args = {
-            "/mnt/c/Users/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/UnityDebugAdapter.dll",
-          },
-        }
+          command = "dotnet",
+          args = { vstuc_path .. "UnityDebugAdapter.dll", "--project", vim.fn.getcwd() .. "/Assembly-CSharp.csproj" },
 
+          name = "Attach to Unity",
+        }
         dap.configurations.cs = {
           {
-            type = "unity",
+            type = "vstuc",
             request = "attach",
-            name = "Unity Editor",
+            name = "Attach to Unity",
+            logFile = vim.fs.joinpath(vim.fn.stdpath "data") .. "/vstuc.log",
+            projectPath = function()
+              local path = vim.fn.expand "%:p"
+              while true do
+                local new_path = vim.fn.fnamemodify(path, ":h")
+                if new_path == path then return "" end
+                path = new_path
+                local assets = vim.fn.glob(path .. "/Assets")
+                if assets ~= "" then return path end
+              end
+            end,
+            endPoint = function()
+              local system_obj = vim.system({ "dotnet", vstuc_path .. "UnityAttachProbe.dll" }, { text = true })
+              local probe_result = system_obj:wait(2000).stdout
+              if probe_result == nil or #probe_result == 0 then
+                print "No endpoint found (is unity running?)"
+                return ""
+              end
+              for json in vim.gsplit(probe_result, "\n") do
+                if json ~= "" then
+                  local probe = vim.json.decode(json)
+                  for _, p in pairs(probe) do
+                    if p.isBackground == false then return p.address .. ":" .. p.debuggerPort end
+                  end
+                end
+              end
+              return ""
+            end,
           },
         }
+        -- dap.adapters.unity = {
+        --   type = "executable",
+        --   -- command = get_conda_executable "omnisharp-mono",
+        --   command = "/home/vpam/.cache/omnisharp-vim/omnisharp-roslyn/run",
+        --   args = {
+        --     "/mnt/c/Users/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/UnityDebugAdapter.dll",
+        --
+        --     -- "/mnt/c/Users/shing/.vscode/extensions/shinganeuler.vscode-unity-debug-3.0.13/External/MonoDevelop.Debugger.dll",
+        --     --
+        --   },
+        -- }
+        --
+        -- dap.configurations.cs = {
+        --   {
+        --     type = "unity",
+        --     request = "attach",
+        --     name = "Unity Editor",
+        --     path = vim.fn.getcwd() .. "/Library/EditorInstance.json",
+        --   },
+        -- }
       end,
 
       -- JavaScript and TypeScript DAP Configuration
@@ -171,6 +219,7 @@ return {
     -- Set up a debugger for the language you need
     setup_debugger "cpp"
     setup_debugger "cs"
+    setup_debugger "unity"
     setup_debugger "javascript"
     setup_debugger "typescript"
     setup_debugger "go"

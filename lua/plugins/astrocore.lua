@@ -43,6 +43,9 @@ return {
         -- This can be found in the `lua/lazy_setup.lua` file
       },
     },
+    ale_linters = {
+      cs = { "OmniSharp" },
+    },
     -- Mappings can be configured through AstroCore as well.
     -- NOTE: keycodes follow the casing in the vimdocs. For example, `<Leader>` must be capitalized
     mappings = {
@@ -99,6 +102,7 @@ return {
         ["<leader>bn"] = { "<cmd>tabnew<cr>", desc = "New tab" },
         ["<leader>gv"] = { "<cmd>e ~/dotfiles/linux/nvim<cr>", desc = "Open Nvim conf location" },
         ["<leader>gz"] = { "<cmd>e ~/dotfiles/linux/zsh<cr>", desc = "Open zsh conf location" },
+        ["<leader>gh"] = { "<cmd>e ~/dotfiles/<cr>", desc = "Open dotfiles location" },
         ["<leader>lc"] = {
           "<cmd>redir > ./message.txt | silent messages | redir END<CR>",
           desc = "Save messages to message.txt",

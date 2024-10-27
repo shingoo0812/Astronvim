@@ -29,38 +29,9 @@ return {
     -- overrides `require("mason-nvim-dap").setup(...)`
     opts = {
       ensure_installed = {
-        "unity",
+        -- "unity",
         -- add more arguments for adding more debuggers
       },
-      -- handlers = {
-      --   function(config)
-      --     -- all sources with no handler get passed here
-      --
-      --     -- Keep original functionality
-      --     require("mason-nvim-dap").default_setup(config)
-      --   end,
-      --   unity = function(config)
-      --     config.adapters = {
-      --       type = "executable",
-      --       command = "/usr/bin/mono",
-      --       args = {
-      --         "/path/to/UnityDebug.exe",
-      --       },
-      --     }
-      --     config.configurations = {
-      --       {
-      --         type = "unity",
-      --         request = "launch",
-      --         name = "Unity Editor",
-      --         program = function() return vim.fn.input("Path to Unity project: ", vim.fn.getcwd(), "file") end,
-      --         args = {
-      --           "-projectPath",
-      --           vim.fn.getcwd(),
-      --         },
-      --       },
-      --     }
-      --   end,
-      -- },
     },
   },
 }
