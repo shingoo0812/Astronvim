@@ -5,6 +5,7 @@ return {
     "theHamsta/nvim-dap-virtual-text",
     "mxsdev/nvim-dap-vscode-js",
     "mfussenegger/nvim-dap-python",
+
     {
       "microsoft/vscode-js-debug",
       build = "npm install --legacy-peer-deps && npm run compile",
@@ -22,18 +23,43 @@ return {
     -- Change path for conda environment or virtual environment
     local function get_conda_executable(bin_name)
       local conda_env = os.getenv "CONDA_PREFIX"
+      local virtual_env = os.getenv "VIRTUAL_ENV"
       local home = string.format("%s/miniconda3", os.getenv "HOME")
       if conda_env and conda_env ~= home then
         print "Using Conda Environment"
-        print(home)
         return string.format("%s/bin/%s", conda_env, bin_name)
       elseif virtual_env then
         print "Using Virtual Environment"
         return string.format("%s/bin/%s", virtual_env, bin_name)
       else
         print "Using System Python"
-        print(bin_name)
         return bin_name
+      end
+    end
+    -- Get OS
+    local function get_os()
+      print "os"
+      local os_name = os.getenv "OS"
+      if os_name and os_name:find "Windows" then
+        return "Windows"
+      else
+        local handle = io.popen "uname -s"
+        local result = handle:read "*l"
+        handle:close()
+        if result == "Darwin" then
+          return "Mac"
+        else
+          return "Linux"
+        end
+      end
+    end
+
+    local function get_unity_for_debug()
+      local ops = get_os()
+      if ops == "Windows" then
+        return "/mnt/c/User/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
+      else
+        return string.format("%s/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/", os.getenv "HOME")
       end
     end
 
@@ -92,8 +118,26 @@ return {
         }
       end,
 
+      gdscript = function()
+        dap.adapters.godot = {
+          type = "server",
+          host = "127.0.0.1",
+          port = 6006,
+        }
+        dap.configurations.gdscript = {
+          {
+            type = "godot",
+            request = "launch",
+            name = "Launch scene",
+            project = "${workspaceFolder}",
+            launch_scene = true,
+          },
+        }
+      end,
+      require("lspconfig").gdscript.setup {},
+
       unity = function()
-        local vstuc_path = "/mnt/c/Users/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
+        local vstuc_path = get_unity_for_debug()
         dap.adapters.vstuc = {
           type = "executable",
           command = "dotnet",
@@ -223,7 +267,7 @@ return {
     setup_debugger "javascript"
     setup_debugger "typescript"
     setup_debugger "go"
-
+    setup_debugger "gdscript"
     -- Register DAP-related key mappings with which-key and descriptions
     -- local wk = require "which-key"
     --

@@ -26,6 +26,11 @@ return {
           "lua",
           "sh",
           "python",
+          "gdscript",
+          "godot_resource",
+          "gdshader",
+          "glsl",
+          "html",
         },
         ignore_filetypes = { -- disable format on save for specified filetypes
           -- "python",
@@ -51,13 +56,18 @@ return {
       clangd = { capabilities = { offsetEncoding = "utf-8" } },
       omnisharp = {
         capabilities = { offsetEncoding = "utf-8" },
+        -- UnitySetting
         settings = {
           omnisharp = {
             useModernNet = false, --[[ enableRoslynAnalyzers = false ]]
           },
+          omnisharp_mono = {
+            useModernNet = true, --[[ enableRoslynAnalyzers = false ]]
+          },
         },
       },
       luau_lsp = { capabilities = { offsetEncoding = "utf-8" } },
+      gdscript = { capabilities = { offsetEncoding = "utf-8" } },
     },
     -- customize how language servers are attached
     handlers = {
@@ -67,10 +77,29 @@ return {
       -- the key is the server that is being setup with `lspconfig`
       -- rust_analyzer = false, -- setting a handler to false will disable the set up of that language server
       -- pyright = function(_, opts) require("lspconfig").pyright.setup(opts) end -- or a custom handler function can be passed
+      --
+      -- UnitySetting
       omnisharp = function(_, opts)
         -- Custom configuration of omni sharp server
-        opts.cmd = { "omnisharp-mono", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) }
+        opts.cmd = {
+          -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
+          "~/.cache/omnisharp-vim/omnisharp-roslyn/OmniSharp.Roslyn.dll",
+          "--languageserver",
+          "--hostPID",
+          tostring(vim.fn.getpid()),
+        }
         require("lspconfig").omnisharp.setup(opts)
+      end,
+
+      omnisharp_mono = function(_, opts)
+        -- Custom configuration of omni sharp server
+        opts.cmd = {
+          "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
+          "--languageserver",
+          "--hostPID",
+          tostring(vim.fn.getpid()),
+        }
+        -- require("lspconfig").omnisharp.setup(opts)
       end,
     },
     -- Configure buffer local auto commands to add when attaching a language server

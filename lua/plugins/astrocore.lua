@@ -41,6 +41,7 @@ return {
         -- configure global vim variables (vim.g)
         -- NOTE: `mapleader` and `maplocalleader` must be set in the AstroNvim opts or before `lazy.setup`
         -- This can be found in the `lua/lazy_setup.lua` file
+        OmniSharp_server_use_net6 = 1,
       },
     },
     ale_linters = {
@@ -96,6 +97,8 @@ return {
         -- Move Line
         ["<A-J>"] = { "<CMD>MOVE .+1<cr>==" },
         ["<A-k>"] = { "<Cmd>move .-2<cr>==" },
+        ["<C-a>"] = { "^", desc = "Move to head" },
+        ["<C-e>"] = { "$", desc = "Move to end" },
         -- Keymaps for diffget. Useful when resolving conflicts
         ["<gh>"] = { "<Cmd>diffget //2<cr>gc", desc = "Grab changes from the left (LOCAL)" },
         ["<gl>"] = { "<Cmd>diffget //3<cr>gc", desc = "Grab changes from the right (INCOMING)" },
@@ -115,11 +118,15 @@ return {
       i = {
         ["jk"] = { "<esc>", desc = "Normal Mode" },
         ["<C-o>"] = { "<esc>o", desc = "Go to normal mode, create new line" },
+        ["<C-a>"] = { "<esc>^", desc = "Move to head" },
+        ["<C-e>"] = { "<esc>$", desc = "Move to end" },
       },
       x = {
         -- Move Line
-        ["<A-j>"] = { ":move '>+1<cr>gcgv=gv" },
         ["<A-k>"] = { ":move '<-2<cr>gcgv=gv" },
+        ["<C-a>"] = { "^", desc = "Move to head" },
+        ["<C-e>"] = { "$", desc = "Move to end" },
+        ["<A-j>"] = { ":move '>+1<cr>gcgv=gv" },
       },
     },
   },
