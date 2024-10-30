@@ -7,8 +7,9 @@ return {
     "williamboman/mason-lspconfig.nvim",
     opts = {
       ensure_installed = {
-        -- "lua_ls",
+        "lua_ls",
         "omnisharp",
+        "zls",
         -- add more arguments for adding more language servers
       },
     },
@@ -20,6 +21,7 @@ return {
     opts = {
       ensure_installed = {
         "stylua",
+        "zls",
         -- add more arguments for adding more null-ls sources
       },
     },
@@ -38,16 +40,5 @@ return {
   -- lspconfig setup for omnisharp
   {
     "neovim/nvim-lspconfig",
-    config = function()
-      require("lspconfig").omnisharp.setup {
-        cmd = {
-          "dotnet",
-          "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll", -- Adjust this path as needed
-          -- "~/.cache/omnisharp-vim/omnisharp-roslyn/OmniSharp.Roslyn.dll",
-        },
-        -- Additional settings can go here
-        useGlobalMono = "never", -- Ensure it uses .NET 6 SDK
-      }
-    end,
   },
 }

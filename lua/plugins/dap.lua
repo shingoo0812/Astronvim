@@ -20,43 +20,51 @@ return {
     dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
     dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
 
+    -----------------------------------------------------------------------------------
     -- Change path for conda environment or virtual environment
+    -----------------------------------------------------------------------------------
     local function get_conda_executable(bin_name)
       local conda_env = os.getenv "CONDA_PREFIX"
       local virtual_env = os.getenv "VIRTUAL_ENV"
       local home = string.format("%s/miniconda3", os.getenv "HOME")
       if conda_env and conda_env ~= home then
-        print "Using Conda Environment"
         return string.format("%s/bin/%s", conda_env, bin_name)
       elseif virtual_env then
-        print "Using Virtual Environment"
         return string.format("%s/bin/%s", virtual_env, bin_name)
       else
-        print "Using System Python"
         return bin_name
       end
     end
+    -----------------------------------------------------------------------------------
     -- Get OS
+    -----------------------------------------------------------------------------------
     local function get_os()
-      print "os"
-      local os_name = os.getenv "OS"
-      if os_name and os_name:find "Windows" then
-        return "Windows"
-      else
-        local handle = io.popen "uname -s"
-        local result = handle:read "*l"
-        handle:close()
-        if result == "Darwin" then
-          return "Mac"
+      local os_name = vim.loop.os_uname().sysname
+
+      if os_name == "Linux" then
+        local f = io.popen "uname -r" -- Get the kernel version
+        local kernel_version = f:read "*a"
+        f:close()
+
+        if kernel_version:match "Microsoft" then
+          return "WSL"
         else
           return "Linux"
         end
+      elseif os_name == "Darwin" then
+        return "Mac"
+      elseif os_name == "Windows_NT" then
+        return "Windows"
+      else
+        return "Unknown"
       end
     end
-
+    -----------------------------------------------------------------------------------
+    --- Get unity for debugger location
+    -----------------------------------------------------------------------------------
     local function get_unity_for_debug()
       local ops = get_os()
-      if ops == "Windows" then
+      if ops == "Windows" or "WSL" then
         return "/mnt/c/User/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
       else
         return string.format("%s/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/", os.getenv "HOME")
@@ -138,17 +146,19 @@ return {
 
       unity = function()
         local vstuc_path = get_unity_for_debug()
-        dap.adapters.vstuc = {
+        dap.adapters.unity = {
           type = "executable",
           command = "dotnet",
-          args = { vstuc_path .. "UnityDebugAdapter.dll", "--project", vim.fn.getcwd() .. "/Assembly-CSharp.csproj" },
-
-          name = "Attach to Unity",
+          args = {
+            vstuc_path .. "UnityDebugAdapter.dll" --[[ , "--project", vim.fn.getcwd() .. "/Assembly-CSharp.csproj" ]],
+          },
+          name = "Unity",
         }
         dap.configurations.cs = {
           {
-            type = "vstuc",
+            type = "unity",
             request = "attach",
+            path = vim.fn.getcwd() .. "/Library/EditorInstance.json",
             name = "Attach to Unity",
             logFile = vim.fs.joinpath(vim.fn.stdpath "data") .. "/vstuc.log",
             projectPath = function()
@@ -180,26 +190,6 @@ return {
             end,
           },
         }
-        -- dap.adapters.unity = {
-        --   type = "executable",
-        --   -- command = get_conda_executable "omnisharp-mono",
-        --   command = "/home/vpam/.cache/omnisharp-vim/omnisharp-roslyn/run",
-        --   args = {
-        --     "/mnt/c/Users/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/UnityDebugAdapter.dll",
-        --
-        --     -- "/mnt/c/Users/shing/.vscode/extensions/shinganeuler.vscode-unity-debug-3.0.13/External/MonoDevelop.Debugger.dll",
-        --     --
-        --   },
-        -- }
-        --
-        -- dap.configurations.cs = {
-        --   {
-        --     type = "unity",
-        --     request = "attach",
-        --     name = "Unity Editor",
-        --     path = vim.fn.getcwd() .. "/Library/EditorInstance.json",
-        --   },
-        -- }
       end,
 
       -- JavaScript and TypeScript DAP Configuration

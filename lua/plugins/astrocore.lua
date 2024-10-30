@@ -86,8 +86,8 @@ return {
         ["<A-,>"] = { ":resize +2<cr>gc", desc = "resize pane to down" },
         ["<A-=>"] = { "<C-w>=", desc = "Resize equal" },
         -- split
-        ["<A-v>"] = { "<C-w>v", desc = "Split window vertically" },
-        ["<A-s>"] = { "<C-w>s", desc = "Split window horizontally" },
+        ["<A-]>"] = { "<C-w>v", desc = "Split window vertically" },
+        ["<A-[>"] = { "<C-w>s", desc = "Split window horizontally" },
         -- Copilot
         ["<leader>k"] = { "", desc = "Copilot" },
         ["<C-[>"] = { ":Copilot suggestion<cr>gc", desc = "Copilot suggestion" },
@@ -120,12 +120,16 @@ return {
         ["<C-o>"] = { "<esc>o", desc = "Go to normal mode, create new line" },
         ["<C-a>"] = { "<esc>^", desc = "Move to head" },
         ["<C-e>"] = { "<esc>$", desc = "Move to end" },
+        ["<C-h>"] = { "<Left>", desc = "Move to right" },
+        ["<C-j>"] = { "<Down>", desc = "Move to down" },
+        ["<C-k>"] = { "<Up>", desc = "Move to up" },
+        ["<C-l>"] = { "<Right>", desc = "Move to left" },
       },
       x = {
         -- Move Line
         ["<A-k>"] = { ":move '<-2<cr>gcgv=gv" },
         ["<C-a>"] = { "^", desc = "Move to head" },
-        ["<C-e>"] = { "$", desc = "Move to end" },
+        ["<C-e>"] = { "$h", desc = "Move to end" },
         ["<A-j>"] = { ":move '>+1<cr>gcgv=gv" },
       },
     },

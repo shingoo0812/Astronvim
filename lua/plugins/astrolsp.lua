@@ -31,6 +31,8 @@ return {
           "gdshader",
           "glsl",
           "html",
+          "zsh",
+          ".zshrc",
         },
         ignore_filetypes = { -- disable format on save for specified filetypes
           -- "python",
@@ -40,7 +42,7 @@ return {
         -- disable lua_ls formatting capability if you want to use StyLua to format your lua code
         -- "lua_ls",
       },
-      timeout_ms = 1000, -- default format timeout
+      timeout_ms = 2000, -- default format timeout
       -- filter = function(client) -- fully override the default formatting function
       --   return true
       -- end
@@ -48,9 +50,11 @@ return {
     -- enable servers that you already have installed without mason
     servers = {
       -- "pyright"
-      "omnisharp",
+      -- "omnisharp",
     },
+    -----------------------------------------------------------------------------------
     -- customize language server configuration options passed to `lspconfig`
+    -----------------------------------------------------------------------------------
     ---@diagnostic disable: missing-fields
     config = {
       clangd = { capabilities = { offsetEncoding = "utf-8" } },
@@ -59,17 +63,21 @@ return {
         -- UnitySetting
         settings = {
           omnisharp = {
-            useModernNet = false, --[[ enableRoslynAnalyzers = false ]]
-          },
-          omnisharp_mono = {
             useModernNet = true, --[[ enableRoslynAnalyzers = false ]]
           },
+          -- omnisharp_mono = {
+          --   useModernNet = true, --[[ enableRoslynAnalyzers = false ]]
+          -- },
         },
       },
-      luau_lsp = { capabilities = { offsetEncoding = "utf-8" } },
+
+      zsh = { capabilities = { offsetEncoding = "utf-8" } },
+      lua_lsp = { capabilities = { offsetEncoding = "utf-8" } },
       gdscript = { capabilities = { offsetEncoding = "utf-8" } },
     },
+    -----------------------------------------------------------------------------------
     -- customize how language servers are attached
+    -----------------------------------------------------------------------------------
     handlers = {
       -- a function without a key is simply the default handler, functions take two parameters, the server name and the configured options table for that server
       -- function(server, opts) require("lspconfig")[server].setup(opts) end
@@ -78,31 +86,32 @@ return {
       -- rust_analyzer = false, -- setting a handler to false will disable the set up of that language server
       -- pyright = function(_, opts) require("lspconfig").pyright.setup(opts) end -- or a custom handler function can be passed
       --
-      -- UnitySetting
+      --Zls
+      zsh = function(_, opts)
+        opts.cmd = {
+          "~/.local/share/nvim/mason/packages/beautysh",
+          "--languageserver",
+          "--hostPID",
+          tostring(vim.fn.getpid()),
+        }
+        require("lspconfig").zls.setup(opts)
+      end,
+      -- Unity
       omnisharp = function(_, opts)
         -- Custom configuration of omni sharp server
         opts.cmd = {
           -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
-          "~/.cache/omnisharp-vim/omnisharp-roslyn/OmniSharp.Roslyn.dll",
+          "dotnet",
           "--languageserver",
           "--hostPID",
           tostring(vim.fn.getpid()),
         }
         require("lspconfig").omnisharp.setup(opts)
       end,
-
-      omnisharp_mono = function(_, opts)
-        -- Custom configuration of omni sharp server
-        opts.cmd = {
-          "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
-          "--languageserver",
-          "--hostPID",
-          tostring(vim.fn.getpid()),
-        }
-        -- require("lspconfig").omnisharp.setup(opts)
-      end,
     },
+    -----------------------------------------------------------------------------------
     -- Configure buffer local auto commands to add when attaching a language server
+    -----------------------------------------------------------------------------------
     autocmds = {
       -- first key is the `augroup` to add the auto commands to (:h augroup)
       lsp_codelens_refresh = {
@@ -124,7 +133,9 @@ return {
         },
       },
     },
+    -----------------------------------------------------------------------------------
     -- mappings to be set up on attaching of a language server
+    -----------------------------------------------------------------------------------
     mappings = {
       n = {
         -- a `cond` key can provided as the string of a server capability to be required to attach, or a function with `client` and `bufnr` parameters from the `on_attach` that returns a boolean
@@ -148,7 +159,35 @@ return {
     -- this would disable semanticTokensProvider for all clients
     -- client.server_capabilities.semanticTokensProvider = nil
     -- end,
-    --
+    -----------------------------------------------------------------------------------
+    -- Custom on_attach function for Unity Projects
+    -- If it is Unity Projects, set useModernNet to false.
+    -----------------------------------------------------------------------------------
+    on_attach = function(client, bufnr)
+      local capabilities = client.server_capabilities
+      local common = require "user.common" -- Common function calls
+      if capabilities.textDocument and capabilities.textDocument.completion then
+        capabilities.textDocument.completion.completionItem.snippetSupport = true
+      else
+        -- print "Completion capabilities not available for this LSP client."
+      end
+
+      local completion_items = common.get_completion_items()
+
+      require("cmp").register_source("user_functions", {
+        complete = function(_, _, callback) callback(completion_items) end,
+      })
+
+      local is_unity_project = vim.fn.glob "ProjectSettings/ProjectVersion.txt" ~= "" -- If it is not null
+      if is_unity_project then
+        client.config.settings.omnisharp.useModernNet = false
+        client.notify "workspace/didChangeConfiguration"
+        vim.cmd "ModifyCSProjFile"
+      end
+    end,
+    -----------------------------------------------------------------------------------
+    -- Modify Unity Configuration. Change to unix notation folder path.
+    -----------------------------------------------------------------------------------
     vim.cmd [[
       command! ModifyCSProjFile call ModifyCSProjFile()
       function! ModifyCSProjFile()
