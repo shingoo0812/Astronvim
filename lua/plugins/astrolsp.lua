@@ -3,6 +3,7 @@
 -- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
 --       as this provides autocomplete and documentation while editing
 
+local common = require "user.common"
 ---@type LazySpec
 return {
   "AstroNvim/astrolsp",
@@ -164,27 +165,13 @@ return {
     -- If it is Unity Projects, set useModernNet to false.
     -----------------------------------------------------------------------------------
     on_attach = function(client, bufnr)
-      local capabilities = client.server_capabilities
-      local common = require "user.common" -- Common function calls
-      if capabilities.textDocument and capabilities.textDocument.completion then
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
-      else
-        -- print "Completion capabilities not available for this LSP client."
-      end
-
-      local completion_items = common.get_completion_items()
-
-      require("cmp").register_source("user_functions", {
-        complete = function(_, _, callback) callback(completion_items) end,
-      })
-
-      local is_unity_project = vim.fn.glob "ProjectSettings/ProjectVersion.txt" ~= "" -- If it is not null
-      if is_unity_project then
+      if common.is_unity(client) then
         client.config.settings.omnisharp.useModernNet = false
         client.notify "workspace/didChangeConfiguration"
         vim.cmd "ModifyCSProjFile"
       end
     end,
+
     -----------------------------------------------------------------------------------
     -- Modify Unity Configuration. Change to unix notation folder path.
     -----------------------------------------------------------------------------------

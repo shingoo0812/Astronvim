@@ -7,7 +7,7 @@
 -- as well as other OS types like macOS and Windows.
 -- @return string The name of the operating system.
 local function get_os()
-  local os_name = vim.loop.os_uname().sysname
+  local os_name = vim.uv.os_uname().sysname
 
   if os_name == "Linux" then
     local f = io.popen "uname -r" -- Get the kernel version
@@ -31,21 +31,30 @@ local function get_os()
   end
 end
 
---- Returns a table of completion items.
--- This should include user-defined functions with their descriptions.
--- @return table A table of completion items.
-local function get_completion_items()
-  return {
-    {
-      label = "get_os",
-      insertText = "get_os()",
-      documentation = "Returns the name of the current operating system.",
-    },
-    -- 他の関数の補完アイテムも追加できます
-  }
+--- Checks if the current project is a Unity project.
+-- @return boolean True if it is a Unity project, false otherwise.
+local function is_unity()
+  local is_unity_project = vim.fn.glob "ProjectSettings/ProjectVersion.txt" ~= ""
+  if is_unity_project then
+    return true
+  else
+    return false
+  end
+end
+
+--- Checks if the current project is a Godot project.
+-- @return boolean True if it is a Godot project, false otherwise.
+local function is_godot()
+  local is_godot_project = vim.fn.glob "project.godot"
+  if is_godot_project then
+    return true
+  else
+    return false
+  end
 end
 
 return {
   get_os = get_os,
-  get_completion_items = get_completion_items,
+  is_unity = is_unity,
+  is_godot = is_godot,
 }

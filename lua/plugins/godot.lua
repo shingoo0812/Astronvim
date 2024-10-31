@@ -25,12 +25,12 @@ return {
   end,
   options = {
     g = {
-      -- godot_executable = function()
-      --         local common = require('user.common')
-      --         local os = common.get_os()
-      --         if os =
-      -- '/mnt/d/Godot/Godot_v4.3-stable_mono_win64/Godot_v4.3-stable_mono_win64.exe'
-      --       end
+      godot_executable = function()
+        local common = require "user.common"
+        if common.is_godot() then
+          return "/mnt/d/Godot/Godot_v4.3-stable_mono_win64/Godot_v4.3-stable_mono_win64.exe"
+        end
+      end,
     },
   },
 }
