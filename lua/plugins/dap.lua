@@ -275,7 +275,6 @@ return {
     setup_debugger "typescript"
     setup_debugger "go"
     setup_debugger "gdscript"
-    setup_debugger "vs"
     -- Register DAP-related key mappings with which-key and descriptions
     -- local wk = require "which-key"
     --
