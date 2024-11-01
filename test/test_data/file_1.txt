@@ -1,2 +1,0 @@
-This is a sample file for testing.
-This file contains the word: foo.
