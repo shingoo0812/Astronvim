@@ -72,6 +72,7 @@ return {
         },
       },
 
+      omnisharp_mono = { capabilities = { offsetEncoding = "utf-8" }, file_type = { "cs" } },
       zsh = { capabilities = { offsetEncoding = "utf-8" } },
       lua_lsp = { capabilities = { offsetEncoding = "utf-8" } },
       gdscript = { capabilities = { offsetEncoding = "utf-8" } },
@@ -97,8 +98,22 @@ return {
         }
         require("lspconfig").zls.setup(opts)
       end,
+
+      omnisharp_mono = function(_, opts)
+        -- Custom configuration of omni sharp server
+        print "mono"
+        opts.cmd = {
+          -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
+          "mono",
+          "--languageserver",
+          "--hostPID",
+          tostring(vim.fn.getpid()),
+        }
+        require("lspconfig").omnisharp.setup(opts)
+      end,
       -- Unity
       omnisharp = function(_, opts)
+        print "omni"
         -- Custom configuration of omni sharp server
         opts.cmd = {
           -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",

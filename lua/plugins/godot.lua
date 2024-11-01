@@ -24,13 +24,13 @@ return {
     end
   end,
   options = {
-    g = {
-      godot_executable = function()
-        local common = require "user.common"
-        if common.is_godot() then
-          return "/mnt/d/Godot/Godot_v4.3-stable_mono_win64/Godot_v4.3-stable_mono_win64.exe"
-        end
-      end,
-    },
+    -- g = {
+    --   godot_executable = function()
+    --     local common = require "user.common"
+    --     if common.is_godot() then
+    --       return "/mnt/d/Godot/Godot_v4.3-stable_mono_win64/Godot_v4.3-stable_mono_win64.exe"
+    --     end
+    --   end,
+    -- },
   },
 }

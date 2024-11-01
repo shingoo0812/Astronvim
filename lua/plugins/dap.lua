@@ -16,13 +16,14 @@ return {
     local dap = require "dap"
     local dapui = require "dapui"
     local common = require "user.common"
-    local json5 = require "json5"
+
     -- If using nvim dap, start dapui automatically
     dap.listeners.before.attach.dapui_config = function() dapui.open() end
     dap.listeners.before.launch.dapui_config = function() dapui.open() end
     dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
     dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
     -- Change path for conda environment or virtual environment
+
     local function get_conda_executable(bin_name)
       local conda_env = os.getenv "CONDA_PREFIX"
       local virtual_env = os.getenv "VIRTUAL_ENV"
@@ -37,8 +38,9 @@ return {
     end
     --- Get unity for debugger location
     local function get_unity_for_debug()
-      local ops = common.get_os()
-      if ops == "Windows" or "WSL" then
+      local oss = common.get_os()
+      print(oss)
+      if os == "Windows" or "WSL" then
         return "/mnt/c/User/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
       else
         return string.format("%s/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/", os.getenv "HOME")
@@ -71,8 +73,8 @@ return {
       end,
 
       cs = function()
-        print(common.is_godot())
         if not common.is_godot() and not common.is_unity() then
+          print "normal cs"
           dap.adapters.coreclr = {
             type = "executable",
             command = get_conda_executable "netcoredbg", -- using netcoredbg in conda
@@ -100,25 +102,42 @@ return {
               cwd = function() return vim.fn.input("Workspace folder: ", vim.fn.getcwd() .. "/", "file") end,
             },
           }
+        elseif common.is_godot() then
+          dap.adapters.godot = {
+            type = "server",
+            host = "127.0.0.1",
+            port = 6006,
+          }
+          dap.configurations.cs = {
+            {
+              type = "godot",
+              request = "launch",
+              preLaunchTask = "build",
+              -- program = "/mnt/d/Godot/Godot_v4.3-stable_mono_win64/Godot_v4.3-stable_mono_win64.exe",
+              name = "GD C# Launch scene",
+              project = "${workspaceFolder}",
+              lanch_scene = true,
+            },
+          }
         end
       end,
 
-      -- gdscript = function()
-      --   dap.adapters.godot = {
-      --     type = "server",
-      --     host = "127.0.0.1",
-      --     port = 6006,
-      --   }
-      --   dap.configurations.gdscript = {
-      --     {
-      --       type = "godot",
-      --       request = "launch",
-      --       name = "Launch scene",
-      --       project = "${workspaceFolder}",
-      --     },
-      --   }
-      -- end,
-      -- require("lspconfig").gdscript.setup {},
+      gdscript = function()
+        dap.adapters.godot = {
+          type = "server",
+          host = "127.0.0.1",
+          port = 6006,
+        }
+        dap.configurations.gdscript = {
+          {
+            type = "godot",
+            request = "launch",
+            name = "Launch scene",
+            project = "${workspaceFolder}",
+          },
+        }
+      end,
+      require("lspconfig").gdscript.setup {},
 
       unity = function()
         if common.is_unity() then
@@ -215,44 +234,6 @@ return {
             name = "Debug",
             request = "launch",
             program = "${file}",
-          },
-        }
-      end,
-
-      gdscript = function()
-        dap.adapters.godot = {
-          type = "server",
-          host = "127.0.0.1",
-          port = 6006,
-        }
-
-        dap.configurations.gdscript = {
-          {
-            type = "godot",
-            request = "launch",
-            name = "Launch scene",
-            project = "${workspaceFolder}",
-          },
-        }
-      end,
-
-      cs = function()
-        dap.adapters.godot = {
-          type = "coreclr",
-          name = "GD C#",
-          request = "attach",
-        }
-
-        dap.configurations.gdscript = {
-          {
-            type = "coreclr",
-            request = "launch",
-            preLaunchTask = "build",
-            program = "/mnt/d/Godot/Godot_v4.3-stable_mono_win64/Godot_v4.3-stable_mono_win64.exe",
-            name = "GD C# Launch scene",
-            cwd = "${workspaceFolder}",
-            stopAtEntry = false,
-            console = "internalConsole",
           },
         }
       end,
