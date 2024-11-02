@@ -39,11 +39,15 @@ return {
     --- Get unity for debugger location
     local function get_unity_for_debug()
       local oss = common.get_os()
+      print "OS"
       print(oss)
-      if os == "Windows" or "WSL" then
-        return "/mnt/c/User/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
+      if oss == "Windows" or "WSL" then
+        print "not"
+
+        return "~/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
+        -- return "/mnt/c/User/shing/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
       else
-        return string.format("%s/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/", os.getenv "HOME")
+        return "~/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.0.4/bin/"
       end
     end
 
@@ -143,17 +147,17 @@ return {
         if common.is_unity() then
           print "Unity project detected"
           local vstuc_path = get_unity_for_debug()
-          dap.adapters.unity = {
+          dap.adapters.vstuc = {
             type = "executable",
             command = "dotnet",
             args = {
-              vstuc_path .. "UnityDebugAdapter.dll" --[[ , "--project", vim.fn.getcwd() .. "/Assembly-CSharp.csproj" ]],
+              vstuc_path .. "UnityDebugAdapter.dll",
             },
             name = "Unity",
           }
           dap.configurations.cs = {
             {
-              type = "unity",
+              type = "vstuc",
               request = "attach",
               path = vim.fn.getcwd() .. "/Library/EditorInstance.json",
               name = "Attach to Unity",
@@ -170,7 +174,7 @@ return {
               end,
               endPoint = function()
                 local system_obj = vim.system({ "dotnet", vstuc_path .. "UnityAttachProbe.dll" }, { text = true })
-                local probe_result = system_obj:wait(2000).stdout
+                local probe_result = system_obj:wait(10000).stdout
                 if probe_result == nil or #probe_result == 0 then
                   print "No endpoint found (is unity running?)"
                   return ""

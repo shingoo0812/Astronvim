@@ -180,8 +180,8 @@ return {
     -- If it is Unity Projects, set useModernNet to false.
     -----------------------------------------------------------------------------------
     on_attach = function(client, bufnr)
-      if common.is_unity(client) then
-        client.config.settings.omnisharp.useModernNet = false
+      if common.is_unity() then
+        -- client.config.settings.omnisharp.useModernNet = false
         client.notify "workspace/didChangeConfiguration"
         vim.cmd "ModifyCSProjFile"
       end
