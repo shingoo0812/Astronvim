@@ -17,6 +17,7 @@ return {
       highlighturl = true, -- highlight URLs at start
       notifications = true, -- enable notifications at start
       swapfile = true, -- enable swapfile at start
+      shell = "/usr/bin/zsh",
     },
     -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
     diagnostics = {

@@ -113,7 +113,6 @@ return {
       end,
       -- Unity
       omnisharp = function(_, opts)
-        print "omni"
         -- Custom configuration of omni sharp server
         opts.cmd = {
           -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
