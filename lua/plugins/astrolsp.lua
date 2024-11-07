@@ -101,7 +101,6 @@ return {
 
       omnisharp_mono = function(_, opts)
         -- Custom configuration of omni sharp server
-        print "mono"
         opts.cmd = {
           -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
           "mono",
@@ -113,15 +112,16 @@ return {
       end,
       -- Unity
       omnisharp = function(_, opts)
-        -- Custom configuration of omni sharp server
-        opts.cmd = {
-          -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
-          "dotnet",
-          "--languageserver",
-          "--hostPID",
-          tostring(vim.fn.getpid()),
-        }
-        require("lspconfig").omnisharp.setup(opts)
+        if not common.is_godot() then
+          opts.cmd = {
+            -- "/home/shingo/omnisharp-roslyn/bin/Debug/OmniSharp.Roslyn/net6.0/OmniSharp.Roslyn.dll",
+            "dotnet",
+            "--languageserver",
+            "--hostPID",
+            tostring(vim.fn.getpid()),
+          }
+          require("lspconfig").omnisharp.setup(opts)
+        end
       end,
     },
     -----------------------------------------------------------------------------------
